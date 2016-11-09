@@ -1,0 +1,131 @@
+# Dual Sentiment Analysis Toolkit
+
+使用本软件前，请先阅读LICENSE文件。
+
+# 目录
+
+- 软件简介
+- 配置安装
+- 数据格式
+- 使用说明
+- 使用示例
+- 问题反馈
+
+# 简介
+
+  本系统是DTDP算法的Python实现。DTDP算法可有效地解决情感分类任务中的极性转移问题，算法详情见[1]。
+本系统使用WordNet根据带有词性标注的训练样本集生成反义词典，并利用生成的反义词典按照一定的规则对训练和测试样本进行翻转，从来扩充样本集。通过对原样本和翻转样本的训练模型，对原测试集和翻转测试集进行预测，最终预测结果综合原训练集和翻转测试集的预测结果。
+
+
+配置安装
+=======================
+本系统可在Linux/Unix系统和Windows系统下运行。
+
+系统所需工具：
+
+- 分类器
+  1. 逻辑回归：liblinear <http://www.csie.ntu.edu.tw/~cjlin/libsvm>
+  2. 支持向量机：libsvm <http://www.csie.ntu.edu.tw/~cjlin/libsvm>
+  3. 朴素贝叶斯：OpenPR_NB <http://msrt.njust.edu.cn/staff/rxia/>
+
+
+- NLTK
+
+  通过NLTK工具包下的wordnet模块辅助构建反义词典，实验中使用的版本为 nltk-2.0.4。
+
+  1. 首先使用nltk对分词的数据（训练集、测试集）进行词性标注。
+  2. 基于NLTK工具包下的wordnet模块的反义字典生成：使用前请安装NLTK工具包。
+
+- Stanford Log-linear Part-Of-Speech Tagger
+
+  当数据量较大时，使用nltk进行词性标注时间代价较高，因此，系统也提供了斯坦福大学的词性标注工具的接口。
+
+  词性标注工具:<http://nlp.stanford.edu/software/tagger.shtml>
+
+
+运行前请在pytc.py模块下为上述工具配置相关路径。
+
+# 数据格式
+
+## 数据
+
+训练集及测试集中的每条样本，均以'\<review_text>'开始，以'\</review_text>'结尾；如样本sampl1, '\<review_text>' sampl1 '\</review_text>'；
+
+
+目录
+-数据目录: 在此目录下有两个文件夹分别名为"train"、"test"；在train和test文件夹下均包含两个文件，分别以"negative","positive"命名，
+           其中文件名为'negative'的为负向情感评论文件，'positive'为正向情感评论文件。
+-翻转目录: 本目录用来存储极性翻转的样本数据。
+-结果输出目录: 预测结果输出目录。
+
+说明：
+	测试样本文件名提供的标签信息只在预测结束后计算准确率时用到，如测试样本标签未知，可以将测试样本随机存储在postive、negative文件中。
+
+使用说明
+=======================
+```powershell
+用法: dsa.py [options] [paramaters]
+选项:  -h, --help, 显示帮助
+          -b, --bigram, 若设置该选项，则同时使用一元、二元特征，否则使用一元特征；
+          -n, --nltk, 若设置该选项则使用nltk模块进行词性标注，否则使用斯坦福大学的词性标注工具；
+          -t, --token path, 已分词的数据文件；
+          -r, --reverse path, 翻转样本目录
+          -o, --output path, 结果输出目录
+          -c, --classifier [libsvm|liblinear|nb], 对偶情感分析算法使用的分类工具，'libsvm', 'liblinear' and 'nb',
+		        分别对应libsvm分类器, logistic regression分类器和朴素贝叶斯分类器
+          -s, --select ratio,选择样本反转的比例；如未设置该选项，则翻转所有训练集样本
+          -f, --fs_method [CHI|IG|LLR|MI|WLLR] 构建伪反义词典的特征选择方法，如未设置该选项则使用wordnet构建反义词典
+参数:
+       weight conferdence, 两个权重参数分别表示基于置信度集成的DSA
+       weight weight weight weight, 四个参数表示基于四系统集成的DSA，四个参数分别对应4个基系统(o2o, o2r, d2o, d2r)的权重
+```
+
+
+使用示例
+=======================
+代码模块：dsa.py 
+
+在windows系统的Dos或linux系统终端下输入相应的指令：
+-基于置信度的三系统集成的DSA:
+```powershell
+$ python dsa.py -n -t data/kitchen -r reverse -o result -c liblinear -s 0.95 0.8 -0.1
+$ python dsa.py -b -n -t data/kitchen -r reverse -o result -c liblinear -s 0.95 0.8 -0.1
+```
+
+说明：	
+```powershell
+data/kitchen：无词性标注的数据目录
+reverse：翻转样本目录
+result：结果输出目录
+liblinear：分类器名称
+0.4：用户定义的d2o（训练集原样本和翻转样本训练模型预测测试集原样本）、d2r集成权重（训练集原样本和翻转样本训练模型预测测试集翻转样本）
+-0.1：用户定义的2com和o2o的集成置信度
+```
+
+此外，在原有工作的基础上，我们还进一步对o2o, o2r, d2o, d2r的结果进行集成。本系统提供了四系统集成的接口：
+-基于四系统集成的DSA:
+```powershell
+$ python dsa.py -n -t data/kitchen -r reverse -o result -c liblinear -s 0.95 0.4 0.1 0.1 0.4
+$ python dsa.py -b -n -t data/kitchen -r reverse -o result -c liblinear -s 0.95 0.4 0.1 0.1 0.4
+```
+
+说明：  
+```powershell
+data/kitchen：无词性标注的数据目录
+reverse：翻转样本目录
+result：结果输出目录
+liblinear：为分类器名称，其中用户输入参数可选择libsvm、liblinear、nb，分别对应着libsvm分类器；逻辑斯蒂回归分类器和朴素贝叶斯分类器
+0.4：o2o系统（原训练集样本预测原测试集样本）权重
+0.1：r2r系统（翻转训练集样本预测翻转测试集样本）权重
+0.1：d2o系统（训练集原样本和翻转样本训练模型预测测试集原样本）权重
+0.4：d2r系统（训练集原样本和翻转样本训练模型预测测试集翻转样本）权重
+```
+
+
+问题反馈
+=======================
+如对本系统有任何疑问，请邮件联系夏睿。
+邮箱：rxia@nlpr.ia.ac.cn (or rxia.cn@gmail.com)。
+
+[1] Rui Xia et al. Dual Training and Dual Prediction for Polarity Classification. In ACL-2013。
+[2] Rui Xia et al. Dual Sentiment Analysis Considering Two Sides of One Review. In IEEE TKDE-2015
