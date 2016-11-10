@@ -1,13 +1,15 @@
 # Dual Sentiment Analysis Toolkit
 
+By Rui Xia, Nanjing University of Science & Technology, China
+
 # Table of Contents
 
 - Introduction
+- Citation
 - Configuration
 - Data Structures
 - Usage
 - Examples
-- Feedback
 
 # Introduction
 
@@ -15,6 +17,14 @@ This code is designed to implement the approach DTDP, an noval and effective met
 This system uses the WordNet to generate an antonym dictionary on the training data with POS tags, and then we use this dictionary to create sentiment-reverse reviews for data expasion according to the reversed
 rules. In DT, the classifier is learnt to maximizing a combination of likehoods of the original and reversed
 training data. In DP, predictions are made by considering two side of one review.
+
+# Citation
+
+If you use this package, please cite the following work:
+
+[1] Rui Xia, Feng Xu, Chengqing Zong, Qianmu Li, Yong Qi, and Tao Li. Dual Sentiment Analysis: Considering Two Sides of One Review. IEEE Transactions on Knowledge and Data Engineering, vol. 27, no. 8, pp. 2120-2133, 2015.
+
+[2] Rui Xia, Tao Wang, Xuelei Hu, Shoushan Li, and Chengqing Zong. Dual Training and Dual Prediction for Polarity Classification. Proceedings of the 51st Annual Meeting of the Association for Computational Linguistics (ACL), pp. 521-525, 2013.
 
 # Configuration
 
@@ -142,8 +152,4 @@ In addition, we generalize dsa to a four system ensemble, using o2o, o2r, d2o, d
 
   ​
 
-# Citation
 
-If you use this source code, please cite the following work:
-[1] Rui Xia, Feng Xu, Chengqing Zong, Qianmu Li, Yong Qi, and Tao Li. Dual Sentiment Analysis: Considering Two Sides of One Review. IEEE Transactions on Knowledge and Data Engineering, vol. 27, no. 8, pp. 2120-2133, 2015.
-[2] Rui Xia, Tao Wang, Xuelei Hu, Shoushan Li, and Chengqing Zong. Dual Training and Dual Prediction for Polarity Classification. Proceedings of the 51st Annual Meeting of the Association for Computational Linguistics (ACL), pp. 521-525, 2013.
