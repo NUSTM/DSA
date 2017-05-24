@@ -2,7 +2,6 @@
 # coding=utf8
 
 '''Dual Sentiment Analysis V0.8
-
 Ref:
 Rui Xia et al. Dual Training and Dual Prediction for Polarity Classification. In ACL-2013.
 Rui Xia et al. Dual Sentiment Analysis. In IEEE TKDE-2015
@@ -50,10 +49,10 @@ def filter_by_postag(fname_socre, adverse_list, postag_list):
     '''
     函数功能：  解析特征选择得分文件，并利用词性过滤，产生候选词
     param:
-    fname_socre: 特征选择得分列表文件(带词性标注 )  
+    fname_socre: 特征选择得分列表文件(带词性标注 )
     adverse_list: 否定词列表(过滤否定词)
     postag_list: 词性列表(形容词副词、动词)
-    '''    
+    '''
     filter_postag_dict = {}
     term_score_list =  [ (line.strip().split()) for line in open(fname_socre, 'r').readlines() ] 
     for term_score in term_score_list:
@@ -642,7 +641,7 @@ def wn_dict_demo(post_data_dir, token_train_dir, antonym_dict_fname, dataset_lis
     print 'Building WN-antonym dict...'
     build_wn_dict(term_post_set, term_set_rank, antonym_dict_fname)
     
-def build_fs_dict(post_data_dir, result_dir, fs_method, dataset_list, fs_percent=1):
+def build_fs_dict(post_data_dir, result_dir, fs_method, dataset_list, fname_fs_dict, fs_percent=1):
     '''
     函数功能：  基于特征选择方法和词性过滤反义词典构建主函数
     param:
@@ -655,7 +654,7 @@ def build_fs_dict(post_data_dir, result_dir, fs_method, dataset_list, fs_percent
     jj_postag_list = ['JJ' ,'JJS' ,'JJR', 'JJ' ,'JJS' ,'JJR','RB' , 'RBS' , 'RBR'] 
     v_postag_list = ['VB' ,'VBZ' , 'VBD' , 'VBN' , 'VBG' , 'VBP']
     postag_list = jj_postag_list + v_postag_list
-    fname_neg_score, fname_pos_score, fname_fs_dict = result_dir + os.sep +'neg.score', result_dir + os.sep + 'pos.score', result_dir + os.sep + 'antonym.dict'
+    fname_neg_score, fname_pos_score = result_dir + os.sep +'neg.score', result_dir + os.sep + 'pos.score'
     doc_str_list_post, doc_class_list_post, doc_str_list_token, doc_class_list_token=[],[],[],[]
     print 'Reading text...'
     for fold in dataset_list:
@@ -869,7 +868,7 @@ def start_demo():
     if 'fs_method' not in dir():
         wn_dict_demo(post_data_dir, token_data_dir, antonym_dict_fname, dataset_list)
     else:
-        build_fs_dict(post_data_dir, result_dir, fs_method, dataset_list)
+        build_fs_dict(post_data_dir, result_dir, fs_method, antonym_dict_fname, dataset_list)
     if 'perc' in dir():
         select_reverse_review_demo(token_data_dir, rev_data_dir, result_dir, antonym_dict_fname, perc, bigram)
     else:
